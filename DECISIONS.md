@@ -27,7 +27,9 @@ So each brand writes its own templates, CSS and CLI. The library provides:
 4. **Knowledge:** an AGENTS.md on using all of the above.
 
 No shared templates, macros, template loader or `Brand` object. Helpers return data, not
-HTML.
+HTML. The exceptions carry no classes and no structure a brand would style: Markdown →
+HTML, and `linkify`'s bare `<a href>`. vlab's `money_html` (cents in a styled span)
+therefore stays in vlab, built on the library's `money_parts`.
 
 ### D-002 — Agent tools are a CLI
 **Status:** Settled · 2026-10-16
