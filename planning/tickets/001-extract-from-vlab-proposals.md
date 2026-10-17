@@ -8,7 +8,7 @@ Move the shared machinery out of `vlab-research/proposals` into this repo, so ev
 brand's builder (Virtual Lab's, opencore's, later ones) uses one copy of the money logic,
 Gantt geometry, budget totals, PDF rendering and verification instead of forking them.
 
-Source: `/home/nandan/Documents/vlab-research/proposals` (`src/vlab_proposals/`).
+Source: `vlab-research/proposals` (`src/vlab_proposals/`), private.
 Shape: D-001.
 
 ## What moves here
@@ -94,5 +94,5 @@ projects (D-003).
     draft mode, `<tfoot>` repeating on every page, header rows needing
     `break-after: avoid`, font fallbacks and synthesised weights, substring matching
     in verify rules, `show_sections` semantics.
-- Not done: no remote for this repo (D-005, public or private, is open), so vlab
-  depends on it by path (`../../proposaurus`). Nothing has been pushed.
+- Published at `github.com/nandanrao/proposaurus` (D-005). vlab still depends on it by
+  path (`../../proposaurus`).

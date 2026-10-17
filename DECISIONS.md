@@ -46,9 +46,11 @@ and fixtures use made-up data. Client material lives in each brand's own private
 ### D-004 — Name: proposaurus
 **Status:** Settled · 2026-10-16
 
+### D-005 — Public, on Nandan's personal GitHub for now
+**Status:** Settled · 2026-10-16
+
+`github.com/nandanrao/proposaurus`, public. It may move to an organisation later.
+
 ---
 
 ## Open
-
-### D-005 — Public or private
-**Status:** OPEN.
