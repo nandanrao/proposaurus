@@ -1,6 +1,6 @@
 # 001 — Extract proposaurus from vlab-proposals
 
-status: ready
+status: done (2026-10-16)
 depends: —
 
 ## Goal
@@ -77,3 +77,22 @@ projects (D-003).
   second brand pack (own templates, CSS, terms, consultant) that renders a made-up
   proposal, with no edits to library code.
 - No vlab name, colour, font, legal text, markup or client material is in this repo.
+
+## Outcome (2026-10-16)
+- Baseline: 15 PDFs (5 examples, 8 project proposals, 1 project report, 1 collateral
+  report). Two renders of unchanged code are pixel-identical, so the bar was exact.
+- After the rewire (vlab `3d0a427`) and after the budget-group change below:
+  `proposaurus diff` reports 15/15 identical (text, page count, pixels at 100 dpi).
+- `make all`, `make verify` (14/14, output byte-identical to the old script's),
+  `make budget` (dump byte-identical to the old reader's), `vlab-report` all work.
+- A fresh agent given only this repo built "Hollow Pine Studio" (own templates, CSS,
+  fonts, terms, consultant; Gantt, grouped budget, draft mode) with no library edits;
+  `proposaurus verify` 2/2. Its findings changed the library and AGENTS.md:
+  - budget groups are now `Part` / `Section` dataclasses, not dicts (`sec.items` on a
+    dict is the `.items` method in Jinja, which crashed its first render);
+  - AGENTS.md gained: Python 3.14 and a build backend in the sample `pyproject.toml`,
+    draft mode, `<tfoot>` repeating on every page, header rows needing
+    `break-after: avoid`, font fallbacks and synthesised weights, substring matching
+    in verify rules, `show_sections` semantics.
+- Not done: no remote for this repo (D-005, public or private, is open), so vlab
+  depends on it by path (`../../proposaurus`). Nothing has been pushed.

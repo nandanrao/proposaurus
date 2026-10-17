@@ -74,8 +74,8 @@ def test_totals():
 
 def test_sections_group_consecutive_runs():
     groups = budget.sections([item(1, section="A"), item(2, section="A"), item(4, section="B"), item(8, section="A")])
-    assert [(g["title"], g["subtotal"]) for g in groups] == [("A", 3), ("B", 4), ("A", 8)]
-    assert [g["title"] for g in budget.sections([item(1), item(2)])] == [None]
+    assert [(g.title, g.subtotal) for g in groups] == [("A", 3), ("B", 4), ("A", 8)]
+    assert [g.title for g in budget.sections([item(1), item(2)])] == [None]
 
 
 def test_parts():
@@ -84,11 +84,11 @@ def test_parts():
         item(50, part="Build", section="Hosting"),
         item(10, part="Run"),
     ])
-    assert [(p["title"], p["total"], p["show_sections"]) for p in parts] == [
+    assert [(p.title, p.total, p.show_sections) for p in parts] == [
         ("Build", 150, True),
         ("Run", 10, False),
     ]
-    assert [s["subtotal"] for s in parts[0]["sections"]] == [100, 50]
+    assert [s.subtotal for s in parts[0].sections] == [100, 50]
     assert budget.has_parts([item(1, part="x")]) and not budget.has_parts([item(1)])
     assert budget.has_sections([item(1, section="x")])
 
@@ -138,3 +138,13 @@ def test_comparison_table_widths():
 def test_clause():
     c = Clause(1, "Services", sub_items=[SubItem("(a)", "Term.")])
     assert c.paragraphs == [] and c.sub_items[0].label == "(a)"
+
+
+def test_groups_read_both_ways_in_jinja():
+    # On a dict, `sec.items` would be the .items method; these are objects.
+    from jinja2 import Environment
+    tpl = Environment().from_string(
+        "{% for p in parts %}{% for s in p.sections %}{{ s.items|length }}"
+        "{{ s['items']|length }}{% endfor %}{% endfor %}"
+    )
+    assert tpl.render(parts=budget.parts([item(1, section="A"), item(2, section="A")])) == "22"

@@ -36,13 +36,22 @@ Never put client material (projects, transcripts, budgets) or anything brand-spe
     └── static/style.css, fonts.css, fonts/*.woff2
 ```
 
-`pyproject.toml` depends on proposaurus through uv:
+`pyproject.toml` depends on proposaurus through uv. proposaurus needs Python 3.14, and
+the brand needs a build backend or `[project.scripts]` won't install its CLI:
 
 ```toml
+[project]
+name = "acme-proposals"
+version = "0.1.0"
+requires-python = ">=3.14"
 dependencies = ["proposaurus"]
 
 [project.scripts]
 acme-proposal = "acme_proposals.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.22,<0.13.0"]
+build-backend = "uv_build"
 
 [tool.uv.sources]
 proposaurus = { path = "../proposaurus", editable = true }   # relative to the brand repo
@@ -79,7 +88,16 @@ class Proposal(BaseModel):
 ```
 
 Use as many or as few of the building blocks as the brand needs; add your own models
-beside them.
+beside them. The example is the minimum: a real cover usually wants a date, the client's
+display name, and perhaps a subtitle or one-line goal. Those are the brand's fields.
+
+### Draft mode
+
+A draft is a costing sent to shape a conversation, not a contract: it has nowhere to
+sign. Implement it in the template: `{% if not p.draft %}` around the agreement, the
+acceptance line and the signature block, and a visible "DRAFT" marker (on the cover,
+say) when it is set. The marker is also what `verify` uses to tell a draft from a
+proposal.
 
 ### render.py and cli.py
 
@@ -124,14 +142,20 @@ render as `"CHF 10.00"`.
   "label": "Wk 1–2"}, …]}`. `name` falls back to `phase`. On `None`, show a plain table.
 - `week_span("Weeks 3-5")` → `(3, 5)`.
 
+In a template, use the filter: `{% set g = p.timeline | gantt %}{% if g %}…chart…{% else
+%}…table…{% endif %}`.
+
 A chart that works: a `<table>` with `table-layout: fixed`, one `<col>` per week, empty
 `<td>`s before `start`, one `<td colspan="end-start+1">` holding the bar, empty `<td>`s
 after.
 
 **`proposaurus.budget`**: all take the list of line items; grouping is by consecutive runs.
-- `parts(items)` → `[{"title", "total", "show_sections", "sections": [{"title", "items",
-  "subtotal"}]}]`. Ungrouped items form one part with `title` `None`.
-- `sections(items)` → `[{"title", "items", "subtotal"}]`.
+- `parts(items)` → list of `Part(title, sections, total, show_sections)`, each section a
+  `Section(title, items, subtotal)`. Ungrouped items form one part with `title` `None`.
+  `show_sections` is true when any section in the part has a title, so a part with one
+  titled section shows a subtotal equal to its total; use `part.sections | length > 1`
+  if that should be hidden.
+- `sections(items)` → list of `Section`.
 - `total`, `effective_total(items, override)`, `has_quantity` (drop the quantity column if
   false), `has_parts`, `has_sections`.
 
@@ -184,6 +208,10 @@ You cannot see a PDF by reading its HTML. After every change that could move som
    name = "report"                # empty `when`: matches anything left
    ```
 
+   Phrases are plain substring matches, so pick ones that occur only where you mean:
+   "Budget" also matches "the Budget" inside an agreement. A draft's `forbid` list works
+   best with the agreement's own title and a signature-block label.
+
    For a one-off: `proposaurus verify out.pdf --require "TOTAL" --forbid "TODO"`. From
    Python: `proposaurus.verify.Kind` and `check_pdf`.
 4. **Diff**: before a refactor or style change, render everything into `before/`;
@@ -198,10 +226,13 @@ values) to text, for reading a client's costing before writing the YAML.
 
 ## WeasyPrint, learned the hard way
 
-- **Bundle the fonts.** `.woff2` files in `static/fonts/`, declared with `@font-face` in a
-  `fonts.css` that `style.css` imports, with URLs relative to `base_url`. They embed in the
-  PDF and render the same on every machine. If a face is missing, WeasyPrint silently
-  falls back to a system font: check the preview.
+- **Bundle the fonts.** Font files (`.woff2`, `.otf` and `.ttf` all work) in
+  `static/fonts/`, declared with `@font-face` in a `fonts.css` that `style.css` imports,
+  with URLs relative to `base_url`. They embed in the PDF and render the same on every
+  machine. If a face is missing, WeasyPrint silently falls back to a system font. Give
+  bundled faces a family name no system font has, so a fallback is visible in `pdffonts
+  out.pdf` instead of hidden behind a same-named system font. A weight or style you didn't
+  bundle is synthesised (fake bold, fake oblique): bundle every one the CSS uses.
 - **`base_url` decides every relative URL.** `href="static/style.css"` in the template
   resolves against the `base_url` passed to `write_pdf`, usually the package directory.
 - **Page furniture is `@page`.** Size and margins there; running footers and page numbers
@@ -210,8 +241,12 @@ values) to text, for reading a client's costing before writing the YAML.
   boxes with `content: none`.
 - **Control breaks explicitly.** `break-inside: avoid` on table rows, clauses, signature
   blocks and anything that must not split; `break-after: avoid` on headings so they don't
-  strand at a page bottom; `break-before: page` for sections that start a page (an
+  strand at a page bottom, and on header *rows* inside tables too (`thead`, a budget's
+  part and section rows); `break-before: page` for sections that start a page (an
   appendix); `break-after: page` on the cover.
+- **`<thead>` and `<tfoot>` repeat on every page a table spans.** Good for column
+  headers; wrong for a grand total, which would print mid-budget at the foot of the first
+  page (and satisfy a verify phrase on the wrong page). Put totals in a final `<tbody>`.
 - **No JavaScript.** Everything is decided at render time in Jinja and CSS.
 - **Tables are the reliable layout tool** for anything tabular (budgets, timelines,
   signature grids). Check any other layout in the preview.

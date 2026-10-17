@@ -113,7 +113,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("preview", help="Rasterise a PDF to PNGs and a contact sheet.")
     p.add_argument("pdf")
-    p.add_argument("--out", help="Output directory (default: preview/ beside the PDF).")
+    p.add_argument(
+        "--out",
+        help="Directory to write <pdf name>/page-N.png and sheet.png into "
+        "(default: preview/ beside the PDF).",
+    )
     p.add_argument("--dpi", type=int, default=60)
     p.add_argument("--first", type=int, help="First page to render.")
     p.add_argument("--last", type=int, help="Last page to render.")

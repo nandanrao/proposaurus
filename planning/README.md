@@ -5,4 +5,4 @@ One markdown file per ticket in `tickets/`, numbered, with a small header (`stat
 
 | # | Ticket | Status |
 |---|---|---|
-| 001 | Extract proposaurus from vlab-proposals | ready |
+| 001 | Extract proposaurus from vlab-proposals | done |

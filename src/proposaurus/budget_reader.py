@@ -109,8 +109,8 @@ def run(args: argparse.Namespace) -> int:
 def main(argv: list[str] | None = None, prog: str | None = None) -> int:
     """Standalone entry point, for a brand that wants its own command name.
 
-    ``vlab-budget = "vlab_proposals.budget_reader:main"`` where that module
-    calls ``main(argv, prog="vlab-budget")``.
+    ``acme-budget = "acme_proposals.budget_reader:main"`` where that module
+    calls ``main(argv, prog="acme-budget")``.
     """
     parser = argparse.ArgumentParser(
         prog=prog,
