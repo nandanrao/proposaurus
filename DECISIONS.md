@@ -39,7 +39,8 @@ Not an MCP server, for now. An MCP server can be added later on top of the same 
 ### D-003 — Its own repo, consumed as a uv dependency; never any client material
 **Status:** Settled · 2026-10-16
 
-Brand packs depend on it through uv (a path dependency during development, git later).
+Brand packs depend on it through uv, as a git dependency pinned in their `uv.lock`
+(a path dependency only while changing both at once).
 It contains no client projects, transcripts, budgets or anything client-specific; tests
 and fixtures use made-up data. Client material lives in each brand's own private repo.
 

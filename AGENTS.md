@@ -54,8 +54,12 @@ requires = ["uv_build>=0.12.22,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv.sources]
-proposaurus = { path = "../proposaurus", editable = true }   # relative to the brand repo
+proposaurus = { git = "https://github.com/nandanrao/proposaurus", branch = "main" }
 ```
+
+`uv.lock` pins the commit; `uv lock --upgrade-package proposaurus` takes the latest
+`main`. To change proposaurus and a brand together, point the source at a local
+checkout for the duration: `proposaurus = { path = "../proposaurus", editable = true }`.
 
 ### schema.py
 

@@ -94,5 +94,5 @@ projects (D-003).
     draft mode, `<tfoot>` repeating on every page, header rows needing
     `break-after: avoid`, font fallbacks and synthesised weights, substring matching
     in verify rules, `show_sections` semantics.
-- Published at `github.com/nandanrao/proposaurus` (D-005). vlab still depends on it by
-  path (`../../proposaurus`).
+- Published at `github.com/nandanrao/proposaurus` (D-005). vlab depends on it as a uv
+  git dependency, pinned in its `uv.lock` (2026-10-19, still 15/15 identical).
